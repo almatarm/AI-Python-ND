@@ -82,7 +82,7 @@ def build_model(arch, nHiddens = 256, nOutputs=102, pDropout=0.2, lr=0.003):
     
     return model, optimizer, criterion
     
-def train_model(device, model, trainloader, optimizer, criterion, testloader, epochs = 5, stop_accuracy = .95, 
+def train_model(device, model, trainloader, optimizer, criterion, validloader, epochs = 5, stop_accuracy = .95, 
                 verbose = False, test_every = 1):
     steps = 0
     running_loss = 0
@@ -106,7 +106,7 @@ def train_model(device, model, trainloader, optimizer, criterion, testloader, ep
                 accuracy = 0
                 model.eval()
                 with torch.no_grad():
-                    for inputs, labels in testloader:
+                    for inputs, labels in validloader:
                         inputs, labels = inputs.to(device), labels.to(device)
                         logps = model.forward(inputs)
                         batch_loss = criterion(logps, labels)
@@ -122,13 +122,13 @@ def train_model(device, model, trainloader, optimizer, criterion, testloader, ep
                 if verbose:
                     print(f"Epoch {epoch+1}/{epochs}.. "
                           f"Train loss: {running_loss/test_every:.3f}.. "
-                          f"Test loss: {test_loss/len(testloader):.3f}.. "
-                          f"Test accuracy: {accuracy/len(testloader):.3f}")
+                          f"Valid loss: {test_loss/len(validloader):.3f}.. "
+                          f"Valid accuracy: {accuracy/len(validloader):.3f}")
                 running_loss = 0
                 model.train()
                 
-                if (accuracy/len(testloader)) >= stop_accuracy:
-                    print('Accurecy Reached: ', accuracy, '>=', stop_accuracy)
+                if (accuracy/len(validloader)) >= stop_accuracy:
+                    print('Accurecy Reached: ', accuracy/len(validloader), '>=', stop_accuracy)
                     return epoch
     return epochs
 

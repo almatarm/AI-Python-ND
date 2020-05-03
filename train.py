@@ -2,7 +2,6 @@ import torch
 from model_helper import Phase
 import model_helper as mh
 import args_parser
-from workspace_utils import active_session
 
 if __name__ == '__main__':
   # Parse Argument
@@ -16,6 +15,7 @@ if __name__ == '__main__':
   # Loading the data
   print('### Loading data')
   train_dataset, trainloader, train_transforms = mh.load_data(Phase.train)
+  valid_dataset, validloader, valid_transforms = mh.load_data(Phase.valid)
   test_dataset, testloader, test_transforms = mh.load_data(Phase.test)
 
   # Building Model
@@ -31,8 +31,7 @@ if __name__ == '__main__':
   # Train Model
   print('### Trainging the model')
   stop_accuracy = args.accurecy / 100.0
-  with active_session():
-    epoch = mh.train_model(device, model, trainloader, optimizer, criterion, testloader, verbose = True, stop_accuracy=stop_accuracy)
+  epoch = mh.train_model(device, model, trainloader, optimizer, criterion, validloader, verbose = True, stop_accuracy=stop_accuracy)
 
   # Testing Network 
   print('### Testing the model')
